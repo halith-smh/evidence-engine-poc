@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Check, Clock, Eye, FileSignature } from 'lucide-react';
 
-const API_BASE = '/api';
+const API_BASE = 'http://localhost:5000/api';
+const UPLOADS_BASE = 'http://localhost:5000/uploads';
 
 function ApproverView({ currentUser, pendingApprovals, myInitiatedRequests, onRefresh }) {
   const [signingRequestId, setSigningRequestId] = useState(null);
@@ -112,7 +113,7 @@ function ApproverView({ currentUser, pendingApprovals, myInitiatedRequests, onRe
 
                   <div className="flex justify-end space-x-3">
                     <a
-                      href={`${API_BASE}/uploads/${request.filename}`}
+                      href={`${UPLOADS_BASE}/${request.filename}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center gap-2"
@@ -199,7 +200,7 @@ function ApproverView({ currentUser, pendingApprovals, myInitiatedRequests, onRe
 
                   <div className="flex justify-end">
                     <a
-                      href={`${API_BASE}/uploads/${request.filename}`}
+                      href={`${UPLOADS_BASE}/${request.filename}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center gap-2"

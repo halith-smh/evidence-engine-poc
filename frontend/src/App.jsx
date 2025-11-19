@@ -8,7 +8,8 @@ import CompletedView from './components/CompletedView';
 import WalletInfo from './components/WalletInfo';
 import VerificationPortal from './components/VerificationPortal';
 
-const API_BASE = '/api';
+// API base URL - works for both manual and Docker setups
+const API_BASE = 'http://localhost:5000/api';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);

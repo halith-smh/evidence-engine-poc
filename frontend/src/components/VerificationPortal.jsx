@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Search, FileText, CheckCircle, XCircle, AlertTriangle, Shield, Link2, Lock, FileCheck, Clock } from 'lucide-react';
 
+const API_BASE = 'http://localhost:5000/api';
+
 export default function VerificationPortal() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -45,7 +47,7 @@ export default function VerificationPortal() {
       const formData = new FormData();
       formData.append('pdf', file);
 
-      const response = await fetch('/api/verify-document', {
+      const response = await fetch(`${API_BASE}/verify-document`, {
         method: 'POST',
         body: formData
       });

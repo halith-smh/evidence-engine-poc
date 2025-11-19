@@ -1,7 +1,7 @@
 import React from 'react';
 import { Download, Shield, ExternalLink, FileCheck, Lock, Link2, FileText } from 'lucide-react';
 
-const API_BASE = '/api';
+const API_BASE = 'http://localhost:5000/api';
 
 function CompletedView({ completedRequests, currentUser }) {
   const formatDate = (dateString) => {
