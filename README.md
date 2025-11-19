@@ -53,7 +53,20 @@ NODE_ENV=development
 
 **Option 1: Docker (Recommended)**
 
+The easiest way to run the entire stack:
+
 ```bash
+# Start all services (MongoDB, Backend, Frontend)
+npm run docker:up
+
+# View logs
+npm run docker:logs
+
+# Stop all services
+npm run docker:down
+
+# Rebuild and restart
+npm run docker:build
 npm run docker:up
 ```
 
@@ -72,9 +85,32 @@ cd frontend && npm run dev
 
 ### Access Points
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-- Health Check: http://localhost:5000/health
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **Health Check**: http://localhost:5000/health
+
+### Docker Commands Reference
+
+```bash
+# Start services in background
+npm run docker:up
+
+# Start services with logs
+docker-compose up
+
+# Stop services
+npm run docker:down
+
+# View logs
+npm run docker:logs
+
+# Restart services
+npm run docker:restart
+
+# Remove all data (fresh start)
+docker-compose down -v
+npm run docker:up
+```
 
 ## Understanding the Technology
 

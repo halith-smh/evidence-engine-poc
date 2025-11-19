@@ -47,7 +47,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files
+// Serve uploaded files (no /api prefix for file serving)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ensure uploads directory exists
@@ -103,7 +103,7 @@ async function initializeServer() {
     logger.info(`Current wallet balance: ${balance} SOL`);
 
     if (balance < 0.001) {
-      logger.warn('WARNING: Low balance! Use POST /request-airdrop to fund the wallet');
+      logger.warn('WARNING: Low balance! Use POST /api/request-airdrop to fund the wallet');
     }
 
     logger.success('Server initialization complete!');
@@ -120,8 +120,11 @@ async function initializeServer() {
 
 // ==================== ROUTES ====================
 
+// Create API router
+const apiRouter = express.Router();
+
 // Health check
-app.get('/health', async (req, res) => {
+apiRouter.get('/health', async (req, res) => {
   try {
     const balance = await getWalletBalance();
     const walletAddress = getWalletAddress();
@@ -142,7 +145,7 @@ app.get('/health', async (req, res) => {
 });
 
 // Request SOL airdrop (Devnet only)
-app.post('/request-airdrop', async (req, res) => {
+apiRouter.post('/request-airdrop', async (req, res) => {
   try {
     const { amount = 2 } = req.body;
 
@@ -170,7 +173,7 @@ app.post('/request-airdrop', async (req, res) => {
 });
 
 // Get wallet info
-app.get('/wallet-info', async (req, res) => {
+apiRouter.get('/wallet-info', async (req, res) => {
   try {
     const balance = await getWalletBalance();
     const address = getWalletAddress();
@@ -187,7 +190,7 @@ app.get('/wallet-info', async (req, res) => {
 });
 
 // Create new request
-app.post('/create-request', upload.single('pdf'), async (req, res) => {
+apiRouter.post('/create-request', upload.single('pdf'), async (req, res) => {
   try {
     const { name, category, initiator, approvers } = req.body;
 
@@ -243,7 +246,7 @@ app.post('/create-request', upload.single('pdf'), async (req, res) => {
 });
 
 // Get all requests
-app.get('/requests', async (req, res) => {
+apiRouter.get('/requests', async (req, res) => {
   try {
     const requests = await Request.find().sort({ createdAt: -1 });
     res.json(requests);
@@ -253,7 +256,7 @@ app.get('/requests', async (req, res) => {
 });
 
 // Get requests for specific user
-app.get('/requests/:email', async (req, res) => {
+apiRouter.get('/requests/:email', async (req, res) => {
   try {
     const { email } = req.params;
 
@@ -272,7 +275,7 @@ app.get('/requests/:email', async (req, res) => {
 });
 
 // Get single request
-app.get('/request/:id', async (req, res) => {
+apiRouter.get('/request/:id', async (req, res) => {
   try {
     const request = await Request.findById(req.params.id);
 
@@ -287,7 +290,7 @@ app.get('/request/:id', async (req, res) => {
 });
 
 // Sign request
-app.post('/sign-request', async (req, res) => {
+apiRouter.post('/sign-request', async (req, res) => {
   try {
     const { requestId, signerEmail } = req.body;
 
@@ -413,7 +416,7 @@ app.post('/sign-request', async (req, res) => {
 });
 
 // Verify blockchain transaction
-app.get('/verify/:signature', async (req, res) => {
+apiRouter.get('/verify/:signature', async (req, res) => {
   try {
     const result = await verifyTransaction(req.params.signature);
     res.json(result);
@@ -423,7 +426,7 @@ app.get('/verify/:signature', async (req, res) => {
 });
 
 // Verify document authenticity (upload PDF for verification)
-app.post('/verify-document', upload.single('pdf'), async (req, res) => {
+apiRouter.post('/verify-document', upload.single('pdf'), async (req, res) => {
   logger.separator();
   logger.info('Document verification request received');
   logger.separator();
@@ -472,7 +475,7 @@ app.post('/verify-document', upload.single('pdf'), async (req, res) => {
 });
 
 // Download PDF
-app.get('/download/:requestId', async (req, res) => {
+apiRouter.get('/download/:requestId', async (req, res) => {
   try {
     const request = await Request.findById(req.params.requestId);
 
@@ -492,6 +495,9 @@ app.get('/download/:requestId', async (req, res) => {
   }
 });
 
+// Mount API router
+app.use('/api', apiRouter);
+
 // ==================== START SERVER ====================
 
 initializeServer().then(() => {
@@ -499,16 +505,17 @@ initializeServer().then(() => {
     logger.separator();
     logger.success(`Server running on http://localhost:${PORT}`);
     logger.info('API Documentation:');
-    logger.info('  GET  /health - Health check');
-    logger.info('  POST /request-airdrop - Request SOL airdrop (devnet)');
-    logger.info('  GET  /wallet-info - Get wallet information');
-    logger.info('  POST /create-request - Create new request');
-    logger.info('  GET  /requests - Get all requests');
-    logger.info('  GET  /requests/:email - Get requests for user');
-    logger.info('  GET  /request/:id - Get single request');
-    logger.info('  POST /sign-request - Sign a request');
-    logger.info('  GET  /download/:requestId - Download PDF');
-    logger.info('  GET  /verify/:signature - Verify blockchain TX');
+    logger.info('  GET  /api/health - Health check');
+    logger.info('  POST /api/request-airdrop - Request SOL airdrop (devnet)');
+    logger.info('  GET  /api/wallet-info - Get wallet information');
+    logger.info('  POST /api/create-request - Create new request');
+    logger.info('  GET  /api/requests - Get all requests');
+    logger.info('  GET  /api/requests/:email - Get requests for user');
+    logger.info('  GET  /api/request/:id - Get single request');
+    logger.info('  POST /api/sign-request - Sign a request');
+    logger.info('  GET  /api/download/:requestId - Download PDF');
+    logger.info('  GET  /api/verify/:signature - Verify blockchain TX');
+    logger.info('  POST /api/verify-document - Verify document authenticity');
     logger.separator();
   });
 });
