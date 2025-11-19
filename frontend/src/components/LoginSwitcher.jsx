@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 
 const MOCK_USERS = [
   { id: 1, name: 'Alice', email: 'alice@example.com', role: 'Initiator', color: 'blue' },
@@ -12,7 +13,7 @@ function LoginSwitcher({ onLogin }) {
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Chain of Custody System
+            KTern Evidence Engine
           </h1>
           <p className="text-xl text-gray-600 mb-2">
             Tamper-Proof Auditable Sign-Off with Blockchain Anchoring
@@ -55,19 +56,19 @@ function LoginSwitcher({ onLogin }) {
           </h3>
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
+              <Check className="text-green-500 mr-2 flex-shrink-0" size={16} />
               <span>Visual signature stamps with coordinate mapping</span>
             </li>
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
+              <Check className="text-green-500 mr-2 flex-shrink-0" size={16} />
               <span>Cryptographic P12 digital signatures (viewable in Adobe Acrobat)</span>
             </li>
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
+              <Check className="text-green-500 mr-2 flex-shrink-0" size={16} />
               <span>Blockchain anchoring on Solana Devnet with immutable audit trail</span>
             </li>
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
+              <Check className="text-green-500 mr-2 flex-shrink-0" size={16} />
               <span>Complete chain of custody with timestamped history</span>
             </li>
           </ul>

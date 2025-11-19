@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Search, LogOut } from 'lucide-react';
 import LoginSwitcher from './components/LoginSwitcher';
 import CreatorView from './components/CreatorView';
 import ApproverView from './components/ApproverView';
@@ -96,7 +97,7 @@ function App() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Chain of Custody System
+                KTern Evidence Engine
               </h1>
               <p className="text-sm text-gray-600">
                 Tamper-Proof Auditable Sign-Off with Blockchain Anchoring
@@ -109,8 +110,9 @@ function App() {
               </div>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
               >
+                <LogOut size={16} />
                 Logout
               </button>
             </div>
@@ -166,13 +168,14 @@ function App() {
             </button>
             <button
               onClick={() => setActiveView('verify')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
                 activeView === 'verify'
                   ? 'border-indigo-500 text-indigo-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              🔍 Verify Document
+              <Search size={16} />
+              Verify Document
             </button>
           </nav>
         </div>
