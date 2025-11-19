@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 
 // Import services
 import { loadCertificate } from './services/certificateService.js';
+import { verifyDocument } from './services/verificationService.js';
 import {
   addVisualSignature,
   applyCryptographicSignature,
@@ -417,6 +418,55 @@ app.get('/verify/:signature', async (req, res) => {
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Verify document authenticity (upload PDF for verification)
+app.post('/verify-document', upload.single('pdf'), async (req, res) => {
+  console.log('\n' + '='.repeat(60));
+  console.log('📤 Document verification request received');
+  console.log('='.repeat(60));
+
+  try {
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'No file uploaded',
+        message: 'Please upload a PDF file'
+      });
+    }
+
+    console.log(`📄 File: ${req.file.originalname}`);
+    console.log(`📊 Size: ${req.file.size} bytes`);
+
+    // Read file into buffer (in-memory processing)
+    const pdfBuffer = fs.readFileSync(req.file.path);
+
+    // Delete the temporary file immediately
+    fs.unlinkSync(req.file.path);
+    console.log('🗑️ Temporary file deleted (in-memory processing)');
+
+    // Verify document (async, non-blocking)
+    const verificationResult = await verifyDocument(pdfBuffer);
+
+    console.log(`✅ Verification complete: ${verificationResult.status}`);
+    console.log('='.repeat(60) + '\n');
+
+    // Return result
+    res.json(verificationResult);
+
+  } catch (error) {
+    console.error('❌ Verification error:', error);
+
+    // Clean up temp file if it exists
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    res.status(500).json({
+      error: 'Verification failed',
+      message: error.message
+    });
   }
 });
 
