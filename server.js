@@ -7,6 +7,9 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
+// Import logger
+import logger from './utils/logger.js';
+
 // Import services
 import { loadCertificate } from './services/certificateService.js';
 import { verifyDocument } from './services/verificationService.js';
@@ -81,38 +84,36 @@ const upload = multer({
 // ==================== STARTUP INITIALIZATION ====================
 
 async function initializeServer() {
-  console.log('\n🚀 Initializing Chain of Custody System...\n');
+  logger.header('Initializing KTern Evidence Engine');
 
   try {
     // 1. Connect to MongoDB
-    console.log('📊 Connecting to MongoDB...');
+    logger.info('Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ MongoDB connected\n');
+    logger.success('MongoDB connected');
 
     // 2. Load certificate (production CA cert or dev self-signed)
     certificateData = await loadCertificate();
-    console.log('');
 
     // 3. Initialize Solana
     const solanaInfo = initializeSolana(process.env.SOLANA_NETWORK);
-    console.log('');
 
     // 4. Check wallet balance
     const balance = await getWalletBalance();
-    console.log(`💰 Current wallet balance: ${balance} SOL`);
+    logger.info(`Current wallet balance: ${balance} SOL`);
 
     if (balance < 0.001) {
-      console.log('⚠️  WARNING: Low balance! Use POST /request-airdrop to fund the wallet');
+      logger.warn('WARNING: Low balance! Use POST /request-airdrop to fund the wallet');
     }
 
-    console.log('\n✅ Server initialization complete!\n');
-    console.log('=' .repeat(60));
-    console.log(`📍 Wallet Address: ${solanaInfo.walletAddress}`);
-    console.log(`🌐 Network: ${process.env.SOLANA_NETWORK}`);
-    console.log(`💰 Balance: ${balance} SOL`);
-    console.log('=' .repeat(60) + '\n');
+    logger.success('Server initialization complete!');
+    logger.separator();
+    logger.info(`Wallet Address: ${solanaInfo.walletAddress}`);
+    logger.info(`Network: ${process.env.SOLANA_NETWORK}`);
+    logger.info(`Balance: ${balance} SOL`);
+    logger.separator();
   } catch (error) {
-    console.error('❌ Initialization failed:', error);
+    logger.error('Initialization failed:', error);
     process.exit(1);
   }
 }
@@ -233,7 +234,7 @@ app.post('/create-request', upload.single('pdf'), async (req, res) => {
       request
     });
   } catch (error) {
-    console.error('Error creating request:', error);
+    logger.error('Error creating request:', error.message);
     res.status(500).json({
       error: 'Failed to create request',
       message: error.message
@@ -315,10 +316,10 @@ app.post('/sign-request', async (req, res) => {
       return res.status(404).json({ error: 'PDF file not found' });
     }
 
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`📝 Processing signature for request: ${request.name}`);
-    console.log(`👤 Signer: ${signerEmail}`);
-    console.log(`${'='.repeat(60)}\n`);
+    logger.separator();
+    logger.info(`Processing signature for request: ${request.name}`);
+    logger.info(`Signer: ${signerEmail}`);
+    logger.separator();
 
     // Step 1: Add visual signature
     await addVisualSignature(
@@ -344,7 +345,7 @@ app.post('/sign-request', async (req, res) => {
     const allSigned = areAllApproversSigned(request.approvers);
 
     if (allSigned) {
-      console.log('\n🎉 All approvers have signed! Initiating finalization...\n');
+      logger.success('All approvers have signed! Initiating finalization...');
 
       request.status = 'completed';
       request.completedAt = new Date();
@@ -376,10 +377,10 @@ app.post('/sign-request', async (req, res) => {
           details: `Document sealed and anchored to blockchain. TX: ${blockchainResult.signature}`
         });
 
-        console.log(`\n✅ Request finalized successfully!`);
-        console.log(`🔗 Blockchain TX: ${blockchainResult.signature}\n`);
+        logger.success('Request finalized successfully!');
+        logger.info(`Blockchain TX: ${blockchainResult.signature}`);
       } catch (blockchainError) {
-        console.error('❌ Blockchain anchoring failed:', blockchainError);
+        logger.error('Blockchain anchoring failed:', blockchainError.message);
         request.history.push({
           action: 'error',
           user: 'SYSTEM',
@@ -403,7 +404,7 @@ app.post('/sign-request', async (req, res) => {
         : null
     });
   } catch (error) {
-    console.error('❌ Error signing request:', error);
+    logger.error('Error signing request:', error.message);
     res.status(500).json({
       error: 'Failed to sign request',
       message: error.message
@@ -423,9 +424,9 @@ app.get('/verify/:signature', async (req, res) => {
 
 // Verify document authenticity (upload PDF for verification)
 app.post('/verify-document', upload.single('pdf'), async (req, res) => {
-  console.log('\n' + '='.repeat(60));
-  console.log('📤 Document verification request received');
-  console.log('='.repeat(60));
+  logger.separator();
+  logger.info('Document verification request received');
+  logger.separator();
 
   try {
     // Check if file was uploaded
@@ -436,27 +437,27 @@ app.post('/verify-document', upload.single('pdf'), async (req, res) => {
       });
     }
 
-    console.log(`📄 File: ${req.file.originalname}`);
-    console.log(`📊 Size: ${req.file.size} bytes`);
+    logger.info(`File: ${req.file.originalname}`);
+    logger.info(`Size: ${req.file.size} bytes`);
 
     // Read file into buffer (in-memory processing)
     const pdfBuffer = fs.readFileSync(req.file.path);
 
     // Delete the temporary file immediately
     fs.unlinkSync(req.file.path);
-    console.log('🗑️ Temporary file deleted (in-memory processing)');
+    logger.debug('Temporary file deleted (in-memory processing)');
 
     // Verify document (async, non-blocking)
     const verificationResult = await verifyDocument(pdfBuffer);
 
-    console.log(`✅ Verification complete: ${verificationResult.status}`);
-    console.log('='.repeat(60) + '\n');
+    logger.success(`Verification complete: ${verificationResult.status}`);
+    logger.separator();
 
     // Return result
     res.json(verificationResult);
 
   } catch (error) {
-    console.error('❌ Verification error:', error);
+    logger.error('Verification error:', error.message);
 
     // Clean up temp file if it exists
     if (req.file && fs.existsSync(req.file.path)) {
@@ -495,25 +496,26 @@ app.get('/download/:requestId', async (req, res) => {
 
 initializeServer().then(() => {
   app.listen(PORT, () => {
-    console.log(`🌐 Server running on http://localhost:${PORT}`);
-    console.log(`📚 API Documentation:`);
-    console.log(`   GET  /health - Health check`);
-    console.log(`   POST /request-airdrop - Request SOL airdrop (devnet)`);
-    console.log(`   GET  /wallet-info - Get wallet information`);
-    console.log(`   POST /create-request - Create new request`);
-    console.log(`   GET  /requests - Get all requests`);
-    console.log(`   GET  /requests/:email - Get requests for user`);
-    console.log(`   GET  /request/:id - Get single request`);
-    console.log(`   POST /sign-request - Sign a request`);
-    console.log(`   GET  /download/:requestId - Download PDF`);
-    console.log(`   GET  /verify/:signature - Verify blockchain TX`);
-    console.log('');
+    logger.separator();
+    logger.success(`Server running on http://localhost:${PORT}`);
+    logger.info('API Documentation:');
+    logger.info('  GET  /health - Health check');
+    logger.info('  POST /request-airdrop - Request SOL airdrop (devnet)');
+    logger.info('  GET  /wallet-info - Get wallet information');
+    logger.info('  POST /create-request - Create new request');
+    logger.info('  GET  /requests - Get all requests');
+    logger.info('  GET  /requests/:email - Get requests for user');
+    logger.info('  GET  /request/:id - Get single request');
+    logger.info('  POST /sign-request - Sign a request');
+    logger.info('  GET  /download/:requestId - Download PDF');
+    logger.info('  GET  /verify/:signature - Verify blockchain TX');
+    logger.separator();
   });
 });
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('\n\n🛑 Shutting down gracefully...');
+  logger.warn('Shutting down gracefully...');
   await mongoose.connection.close();
   process.exit(0);
 });

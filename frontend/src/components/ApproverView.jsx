@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Check, Clock, Eye, FileSignature } from 'lucide-react';
 
 const API_BASE = '/api';
 
@@ -114,15 +115,17 @@ function ApproverView({ currentUser, pendingApprovals, myInitiatedRequests, onRe
                       href={`${API_BASE}/uploads/${request.filename}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center gap-2"
                     >
+                      <Eye size={16} />
                       View Document
                     </a>
                     <button
                       onClick={() => handleSign(request._id)}
                       disabled={signingRequestId === request._id}
-                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
                     >
+                      <FileSignature size={16} />
                       {signingRequestId === request._id ? 'Signing...' : 'Sign Document'}
                     </button>
                   </div>
@@ -180,11 +183,15 @@ function ApproverView({ currentUser, pendingApprovals, myInitiatedRequests, onRe
                       <div key={idx} className="flex items-center justify-between text-sm">
                         <span className="text-gray-700">{approver.email}</span>
                         {approver.signed ? (
-                          <span className="text-green-600 font-medium">
-                            ✓ Signed {approver.signedAt ? `on ${formatDate(approver.signedAt)}` : ''}
+                          <span className="text-green-600 font-medium flex items-center gap-1">
+                            <Check size={14} />
+                            Signed {approver.signedAt ? `on ${formatDate(approver.signedAt)}` : ''}
                           </span>
                         ) : (
-                          <span className="text-yellow-600 font-medium">⏳ Pending</span>
+                          <span className="text-yellow-600 font-medium flex items-center gap-1">
+                            <Clock size={14} />
+                            Pending
+                          </span>
                         )}
                       </div>
                     ))}
@@ -195,8 +202,9 @@ function ApproverView({ currentUser, pendingApprovals, myInitiatedRequests, onRe
                       href={`${API_BASE}/uploads/${request.filename}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center gap-2"
                     >
+                      <Eye size={16} />
                       View Document
                     </a>
                   </div>

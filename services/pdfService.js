@@ -74,9 +74,9 @@ export async function applyCryptographicSignature(pdfPath, p12Buffer, password) 
     console.log('📋 Adding signature placeholder...');
     pdfBuffer = plainAddPlaceholder({
       pdfBuffer,
-      reason: 'Document certified by Chain of Custody System',
-      contactInfo: 'support@chainofcustody.local',
-      name: 'Chain of Custody System',
+      reason: 'Document certified by KTern Evidence Engine',
+      contactInfo: 'support@kternevidence.local',
+      name: 'KTern Evidence Engine',
       location: 'Blockchain Network',
     });
 

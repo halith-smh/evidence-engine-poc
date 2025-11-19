@@ -61,7 +61,7 @@ export function generateSelfSignedCertificate() {
 
   const attrs = [{
     name: 'commonName',
-    value: 'Chain of Custody System'
+    value: 'KTern Evidence Engine'
   }, {
     name: 'countryName',
     value: 'US'
@@ -73,7 +73,7 @@ export function generateSelfSignedCertificate() {
     value: 'San Francisco'
   }, {
     name: 'organizationName',
-    value: 'Chain of Custody PoC'
+    value: 'KTern Evidence PoC'
   }, {
     shortName: 'OU',
     value: 'Digital Signature Authority'
@@ -102,7 +102,7 @@ export function generateSelfSignedCertificate() {
     name: 'subjectAltName',
     altNames: [{
       type: 6, // URI
-      value: 'http://chainofcustody.local'
+      value: 'http://kternevidence.local'
     }]
   }]);
 
@@ -117,7 +117,7 @@ export function generateSelfSignedCertificate() {
     {
       algorithm: '3des',
       generateLocalKeyId: true,
-      friendlyName: 'Chain of Custody Signing Certificate'
+      friendlyName: 'KTern Evidence Signing Certificate'
     }
   );
 

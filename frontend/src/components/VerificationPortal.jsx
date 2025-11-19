@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Search, FileText, CheckCircle, XCircle, AlertTriangle, Shield, Link2, Lock, FileCheck, Clock } from 'lucide-react';
 
 export default function VerificationPortal() {
   const [file, setFile] = useState(null);
@@ -72,9 +73,12 @@ export default function VerificationPortal() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-2">🔍 Document Verification Portal</h1>
+        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+          <Search className="w-8 h-8" />
+          Document Verification Portal
+        </h1>
         <p className="text-gray-600 mb-6">
-          Verify the authenticity of Chain of Custody signed documents
+          Verify the authenticity of KTern Evidence signed documents
         </p>
 
         {!result ? (
@@ -96,11 +100,14 @@ export default function VerificationPortal() {
               />
 
               <label htmlFor="file-upload" className="cursor-pointer">
-                <div className="text-6xl mb-4">📄</div>
+                <div className="mb-4 flex justify-center">
+                  <FileText className="w-16 h-16 text-gray-400" />
+                </div>
                 {file ? (
                   <>
-                    <p className="text-lg font-semibold text-green-700 mb-2">
-                      ✅ {file.name}
+                    <p className="text-lg font-semibold text-green-700 mb-2 flex items-center justify-center gap-2">
+                      <CheckCircle size={20} />
+                      {file.name}
                     </p>
                     <p className="text-sm text-gray-600">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
@@ -121,7 +128,10 @@ export default function VerificationPortal() {
 
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p className="text-red-700">❌ {error}</p>
+                <p className="text-red-700 flex items-center gap-2">
+                  <XCircle size={16} />
+                  {error}
+                </p>
               </div>
             )}
 
@@ -155,7 +165,10 @@ export default function VerificationPortal() {
                   Verifying...
                 </span>
               ) : (
-                '🔍 Verify Document'
+                <span className="flex items-center gap-2">
+                  <Search size={20} />
+                  Verify Document
+                </span>
               )}
             </button>
 
@@ -198,11 +211,11 @@ function VerificationResults({ result, onReset }) {
             : 'bg-red-50 border-2 border-red-500'
         }`}
       >
-        <h2 className={`text-2xl font-bold ${isVerified ? 'text-green-700' : 'text-red-700'}`}>
-          {isVerified && '✅ DOCUMENT VERIFIED'}
-          {isNotFound && '❌ DOCUMENT NOT FOUND'}
-          {isTampered && '⚠️ TAMPERING DETECTED'}
-          {!isVerified && !isNotFound && !isTampered && `⚠️ ${result.status}`}
+        <h2 className={`text-2xl font-bold flex items-center gap-2 ${isVerified ? 'text-green-700' : 'text-red-700'}`}>
+          {isVerified && <><CheckCircle size={28} /> DOCUMENT VERIFIED</>}
+          {isNotFound && <><XCircle size={28} /> DOCUMENT NOT FOUND</>}
+          {isTampered && <><AlertTriangle size={28} /> TAMPERING DETECTED</>}
+          {!isVerified && !isNotFound && !isTampered && <><AlertTriangle size={28} /> {result.status}</>}
         </h2>
         <p className={`mt-2 ${isVerified ? 'text-green-600' : 'text-red-600'}`}>
           {isVerified && 'This document is authentic and has not been modified'}
@@ -238,7 +251,10 @@ function VerificationResults({ result, onReset }) {
       {/* Document Info */}
       {result.document && result.document.hash && (
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
-          <h3 className="font-semibold mb-3">📄 Document Information</h3>
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <FileText size={18} />
+            Document Information
+          </h3>
           <div className="space-y-2 text-sm">
             {result.document.name && (
               <div>
@@ -263,10 +279,13 @@ function VerificationResults({ result, onReset }) {
       {/* Blockchain Info */}
       {result.blockchain && result.blockchain.found && (
         <div className="bg-blue-50 rounded-lg p-6 mb-6">
-          <h3 className="font-semibold mb-3">🔗 Blockchain Verification</h3>
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Link2 size={18} />
+            Blockchain Verification
+          </h3>
           <div className="space-y-2 text-sm">
             <div className="flex items-center">
-              <span className="text-green-600 font-bold mr-2">✅</span>
+              <CheckCircle className="text-green-600 font-bold mr-2" size={16} />
               <span>Document found on Solana {result.blockchain.network}</span>
             </div>
             <div>
@@ -298,13 +317,16 @@ function VerificationResults({ result, onReset }) {
       {/* Cryptographic Signature */}
       {result.cryptographicSignature && result.cryptographicSignature.found && (
         <div className="bg-purple-50 rounded-lg p-6 mb-6">
-          <h3 className="font-semibold mb-3">🔐 Cryptographic Signature</h3>
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Lock size={18} />
+            Cryptographic Signature
+          </h3>
           <div className="space-y-2 text-sm">
             <div className="flex items-center">
               {result.cryptographicSignature.valid ? (
-                <span className="text-green-600 font-bold mr-2">✅</span>
+                <CheckCircle className="text-green-600 font-bold mr-2" size={16} />
               ) : (
-                <span className="text-red-600 font-bold mr-2">❌</span>
+                <XCircle className="text-red-600 font-bold mr-2" size={16} />
               )}
               <span>
                 P12 Digital Signature {result.cryptographicSignature.valid ? 'Valid' : 'Invalid'}
@@ -325,10 +347,13 @@ function VerificationResults({ result, onReset }) {
         </div>
       )}
 
-      {/* Chain of Custody */}
+      {/* KTern Evidence */}
       {result.chainOfCustody && result.chainOfCustody.approvers && (
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
-          <h3 className="font-semibold mb-3">✍️ Chain of Custody</h3>
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <FileCheck size={18} />
+            KTern Evidence
+          </h3>
           <div className="space-y-3">
             <div className="text-sm">
               <span className="font-medium">Initiated by:</span>{' '}
@@ -343,9 +368,9 @@ function VerificationResults({ result, onReset }) {
                     className="flex items-center text-sm bg-white p-3 rounded"
                   >
                     {approver.signed ? (
-                      <span className="text-green-600 font-bold mr-2">✅</span>
+                      <CheckCircle className="text-green-600 font-bold mr-2" size={16} />
                     ) : (
-                      <span className="text-gray-400 font-bold mr-2">⏳</span>
+                      <Clock className="text-gray-400 font-bold mr-2" size={16} />
                     )}
                     <div className="flex-1">
                       <div className="font-medium">{approver.email}</div>
@@ -406,9 +431,10 @@ function VerificationResults({ result, onReset }) {
       <div className="flex gap-4">
         <button
           onClick={onReset}
-          className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg"
+          className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
         >
-          ✅ Verify Another Document
+          <CheckCircle size={20} />
+          Verify Another Document
         </button>
       </div>
 
