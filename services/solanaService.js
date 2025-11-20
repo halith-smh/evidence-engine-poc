@@ -27,17 +27,56 @@ export function initializeSolana(network = 'devnet') {
   connection = new Connection(endpoint, 'confirmed');
 
   // Load or generate wallet
-  if (fs.existsSync(WALLET_PATH)) {
+  // Check if wallet file exists AND is a file (not a directory)
+  if (fs.existsSync(WALLET_PATH) && fs.statSync(WALLET_PATH).isFile()) {
     console.log('📂 Loading existing Solana wallet...');
     const walletData = JSON.parse(fs.readFileSync(WALLET_PATH, 'utf-8'));
     walletKeypair = Keypair.fromSecretKey(new Uint8Array(walletData));
   } else {
     console.log('🔑 Generating new Solana wallet...');
-    walletKeypair = Keypair.generate();
-    fs.writeFileSync(
-      WALLET_PATH,
-      JSON.stringify(Array.from(walletKeypair.secretKey))
-    );
+
+    // If wallet.json exists as a directory, we can't use it
+    if (fs.existsSync(WALLET_PATH) && fs.statSync(WALLET_PATH).isDirectory()) {
+      console.log('⚠️  wallet.json exists as a directory (possibly Docker volume mount)');
+      console.log('💡 Using alternative path: ./data/wallet.json');
+
+      // Use alternative path inside a data directory
+      const dataDir = './data';
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+
+      const altWalletPath = path.join(dataDir, 'wallet.json');
+
+      // Check if wallet exists in alternative location
+      if (fs.existsSync(altWalletPath) && fs.statSync(altWalletPath).isFile()) {
+        console.log('📂 Loading wallet from alternative location...');
+        const walletData = JSON.parse(fs.readFileSync(altWalletPath, 'utf-8'));
+        walletKeypair = Keypair.fromSecretKey(new Uint8Array(walletData));
+      } else {
+        // Generate new wallet in alternative location
+        walletKeypair = Keypair.generate();
+        fs.writeFileSync(
+          altWalletPath,
+          JSON.stringify(Array.from(walletKeypair.secretKey))
+        );
+        console.log('✅ New wallet saved to ./data/wallet.json');
+        console.log('🎉 New wallet created - will request airdrop automatically...');
+        // Set flag to request airdrop after initialization
+        global.shouldRequestInitialAirdrop = true;
+      }
+    } else {
+      // Normal case: generate wallet at default location
+      walletKeypair = Keypair.generate();
+      fs.writeFileSync(
+        WALLET_PATH,
+        JSON.stringify(Array.from(walletKeypair.secretKey))
+      );
+      console.log('✅ New wallet saved to wallet.json');
+      console.log('🎉 New wallet created - will request airdrop automatically...');
+      // Set flag to request airdrop after initialization
+      global.shouldRequestInitialAirdrop = true;
+    }
   }
 
   console.log(`✅ Solana initialized on ${network}`);
