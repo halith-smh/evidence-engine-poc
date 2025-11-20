@@ -63,7 +63,7 @@ function ApproverView({ currentUser, pendingApprovals, myInitiatedRequests, onRe
       {/* Pending Approvals */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Pending Your Signature ({pendingApprovals.length})
+          Pending Signature ({pendingApprovals.length})
         </h2>
 
         {pendingApprovals.length === 0 ? (

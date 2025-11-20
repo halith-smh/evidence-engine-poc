@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, LogOut } from 'lucide-react';
+import { Search, LogOut, BookOpen } from 'lucide-react';
 import LoginSwitcher from './components/LoginSwitcher';
 import CreatorView from './components/CreatorView';
 import ApproverView from './components/ApproverView';
 import CompletedView from './components/CompletedView';
 import WalletInfo from './components/WalletInfo';
 import VerificationPortal from './components/VerificationPortal';
+import DocumentationPage from './components/DocumentationPage';
 
 // API base URL - works for both manual and Docker setups
 const API_BASE = 'http://localhost:5000/api';
@@ -155,7 +156,7 @@ function App() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Create Request
+              Create Signoff
             </button>
             <button
               onClick={() => setActiveView('completed')}
@@ -177,6 +178,17 @@ function App() {
             >
               <Search size={16} />
               Verify Document
+            </button>
+            <button
+              onClick={() => setActiveView('docs')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                activeView === 'docs'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <BookOpen size={16} />
+              Documentation
             </button>
           </nav>
         </div>
@@ -214,6 +226,9 @@ function App() {
             )}
             {activeView === 'verify' && (
               <VerificationPortal />
+            )}
+            {activeView === 'docs' && (
+              <DocumentationPage />
             )}
           </>
         )}

@@ -99,10 +99,22 @@ async function initializeServer() {
     const solanaInfo = initializeSolana(process.env.SOLANA_NETWORK);
 
     // 4. Check wallet balance
-    const balance = await getWalletBalance();
+    let balance = await getWalletBalance();
     logger.info(`Current wallet balance: ${balance} SOL`);
 
-    if (balance < 0.001) {
+    // 5. Auto-request airdrop for new wallets
+    if (global.shouldRequestInitialAirdrop && balance < 0.001) {
+      logger.info('🚀 Automatically requesting airdrop for new wallet...');
+      try {
+        const airdropResult = await requestAirdrop(2);
+        balance = airdropResult.balance;
+        logger.success(`✅ Initial airdrop successful! Balance: ${balance} SOL`);
+        delete global.shouldRequestInitialAirdrop; // Clear the flag
+      } catch (error) {
+        logger.warn(`⚠️  Initial airdrop failed: ${error.message}`);
+        logger.info('💡 You can manually request airdrop via the UI or POST /api/request-airdrop');
+      }
+    } else if (balance < 0.001) {
       logger.warn('WARNING: Low balance! Use POST /api/request-airdrop to fund the wallet');
     }
 

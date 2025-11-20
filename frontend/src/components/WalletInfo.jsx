@@ -1,7 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function WalletInfo({ walletInfo, onRequestAirdrop }) {
+  const [isAirdropLoading, setIsAirdropLoading] = useState(false);
+
   if (!walletInfo) return null;
+
+  const handleAirdropClick = async () => {
+    setIsAirdropLoading(true);
+    try {
+      await onRequestAirdrop();
+    } finally {
+      setIsAirdropLoading(false);
+    }
+  };
 
   const balance = parseFloat(walletInfo.balance);
   const isLowBalance = balance < 0.001;
@@ -32,10 +43,14 @@ function WalletInfo({ walletInfo, onRequestAirdrop }) {
               </span>
             )}
             <button
-              onClick={onRequestAirdrop}
-              className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition"
+              onClick={handleAirdropClick}
+              disabled={isAirdropLoading}
+              className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Request Airdrop (2 SOL)
+              {isAirdropLoading && (
+                <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              )}
+              {isAirdropLoading ? 'Requesting...' : 'Request Airdrop (2 SOL)'}
             </button>
             <a
               href={walletInfo.explorerUrl}

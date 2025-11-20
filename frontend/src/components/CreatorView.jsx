@@ -3,6 +3,13 @@ import axios from 'axios';
 
 const API_BASE = 'http://localhost:5000/api';
 
+// Predefined list of approver emails
+const PREDEFINED_EMAILS = [
+  'alice@example.com',
+  'bob@example.com',
+  'diana@example.com'
+];
+
 function CreatorView({ currentUser, onRequestCreated }) {
   const [formData, setFormData] = useState({
     name: '',
@@ -89,7 +96,7 @@ function CreatorView({ currentUser, onRequestCreated }) {
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Create New Request
+          Create New Signoff
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -97,7 +104,7 @@ function CreatorView({ currentUser, onRequestCreated }) {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Request Name *
+                Signoff Name *
               </label>
               <input
                 type="text"
@@ -167,13 +174,16 @@ function CreatorView({ currentUser, onRequestCreated }) {
                       <label className="block text-xs font-medium text-gray-600 mb-1">
                         Email
                       </label>
-                      <input
-                        type="email"
+                      <select
                         value={approver.email}
                         onChange={(e) => handleApproverChange(index, 'email', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-indigo-500"
-                        placeholder="approver@example.com"
-                      />
+                      >
+                        <option value="">Select approver...</option>
+                        {PREDEFINED_EMAILS.filter(email => email !== currentUser.email).map(email => (
+                          <option key={email} value={email}>{email}</option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">
