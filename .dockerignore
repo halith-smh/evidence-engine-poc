@@ -10,4 +10,3 @@ build
 coverage
 *.md
 .vscode
-wallet.json
