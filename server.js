@@ -102,20 +102,28 @@ async function initializeServer() {
     let balance = await getWalletBalance();
     logger.info(`Current wallet balance: ${balance} SOL`);
 
-    // 5. Auto-request airdrop for new wallets
+    // 5. Check if new wallet needs funding
     if (global.shouldRequestInitialAirdrop && balance < 0.001) {
-      logger.info('🚀 Automatically requesting airdrop for new wallet...');
-      try {
-        const airdropResult = await requestAirdrop(2);
-        balance = airdropResult.balance;
-        logger.success(`✅ Initial airdrop successful! Balance: ${balance} SOL`);
-        delete global.shouldRequestInitialAirdrop; // Clear the flag
-      } catch (error) {
-        logger.warn(`⚠️  Initial airdrop failed: ${error.message}`);
-        logger.info('💡 You can manually request airdrop via the UI or POST /api/request-airdrop');
-      }
+      logger.info('🎉 New wallet created!');
+      logger.warn('⚠️  Wallet needs funding to anchor documents on blockchain');
+      logger.info('');
+      logger.info('📝 To fund your wallet, choose ONE of these options:');
+      logger.info('');
+      logger.info('   Option 1: Use the Web Faucet (RECOMMENDED)');
+      logger.info(`   Visit: https://faucet.solana.com`);
+      logger.info(`   Wallet: ${getWalletAddress()}`);
+      logger.info('');
+      logger.info('   Option 2: Use the UI');
+      logger.info('   Click "Request Airdrop (2 SOL)" button after logging in');
+      logger.info('');
+      logger.info('   Option 3: Use API');
+      logger.info('   POST http://localhost:5000/api/request-airdrop');
+      logger.info('   Body: {"amount": 2}');
+      logger.info('');
+      delete global.shouldRequestInitialAirdrop; // Clear the flag
     } else if (balance < 0.001) {
-      logger.warn('WARNING: Low balance! Use POST /api/request-airdrop to fund the wallet');
+      logger.warn('⚠️  Low balance! Fund wallet to anchor documents');
+      logger.info(`💡 Visit https://faucet.solana.com with wallet: ${getWalletAddress()}`);
     }
 
     logger.success('Server initialization complete!');

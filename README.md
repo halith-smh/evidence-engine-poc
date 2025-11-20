@@ -49,6 +49,24 @@ SOLANA_NETWORK=devnet
 NODE_ENV=development
 ```
 
+### Wallet Setup (IMPORTANT)
+
+**For PoC Testing:**
+
+If you received a `wallet.json` file (pre-funded test wallet):
+
+1. Place `wallet.json` in the root directory
+2. Start the application - it will use the existing wallet
+
+**For New Setup:**
+
+The system will automatically create a new wallet. To fund it:
+- Option 1: Visit https://faucet.solana.com (RECOMMENDED)
+- Option 2: Click "Request Airdrop" button in the UI
+- Option 3: Use `solana airdrop 2 <ADDRESS> --url devnet`
+
+📖 **See [WALLET_SETUP.md](WALLET_SETUP.md) for detailed instructions**
+
 ### Running the Application
 
 **Option 1: Docker (Recommended)**
